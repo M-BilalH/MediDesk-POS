@@ -9,7 +9,7 @@
 [![SQLite](https://img.shields.io/badge/SQLite-WASM-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Windows](https://img.shields.io/badge/Platform-Windows%207%2F8%2F10%2F11-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
-[![GitHub Release](https://img.shields.io/github/v/release/SyedBrothers/medidesk-pos?style=for-the-badge&color=blue)](https://github.com/M-BilalH/MediDesk-POS/releases)
+
 
 ---
 
@@ -42,7 +42,7 @@
 
 MediDesk POS uses a multi-process Electron architecture isolating system hardware IPC calls from UI rendering.
 
-```mermaid
+```
 graph TD
     subgraph Client UI Layer (Renderer)
         A["HTML5 / CSS3 Glassmorphism UI"] --> B["JavaScript App Engine (app.js)"]
