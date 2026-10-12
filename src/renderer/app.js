@@ -1359,7 +1359,7 @@ function renderThermalReceipt(data) {
     <div class="receipt-footer">
       <div class="receipt-divider"></div>
       <div>${escapeHtml(settings.receipt_disclaimer || '')}</div>
-      <div style="margin-top:4px; font-weight:bold;">MediDesk POS - Offline Pharmacy System</div>
+      <div style="margin-top:4px; font-weight:bold;">Software by Syed Bilal (contact:0330449560,email:hashmib447@gmail.com)</div>
     </div>
   `;
 }
