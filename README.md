@@ -23,6 +23,9 @@
 
 ---
 
+<img width="1897" height="1024" alt="image" src="https://github.com/user-attachments/assets/7ea30a4f-f185-4e01-b444-1cd3f6939faa" />
+
+
 ## 🌟 Key Highlights & Features
 
 | Feature Module | Description & Capabilities |
