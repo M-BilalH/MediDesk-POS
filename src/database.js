@@ -1,6 +1,6 @@
 /**
  * MediDesk POS Database Module
- * Simplified Product-Centric Architecture (Batches removed, Auto-Barcode enabled)
+ * Production-Ready Pharmacy Schema, Indices & Seed Data
  */
 
 const SCHEMA_SQL = `
@@ -155,6 +155,15 @@ CREATE TABLE IF NOT EXISTS void_sales (
   voided_at TEXT NOT NULL,
   FOREIGN KEY (sale_id) REFERENCES sales(id)
 );
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  user_name TEXT,
+  action TEXT NOT NULL,
+  details TEXT DEFAULT '',
+  created_at TEXT NOT NULL
+);
 `;
 
 const INDEX_SQL = `
@@ -169,6 +178,7 @@ CREATE INDEX IF NOT EXISTS idx_sales_customer ON sales(customer_id);
 CREATE INDEX IF NOT EXISTS idx_sale_items_sale ON sale_items(sale_id);
 CREATE INDEX IF NOT EXISTS idx_sale_items_product ON sale_items(product_id);
 CREATE INDEX IF NOT EXISTS idx_customer_ledger_customer ON customer_ledger(customer_id);
+CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at);
 `;
 
 const DEFAULT_SEED_DATA = {

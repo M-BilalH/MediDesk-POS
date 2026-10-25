@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: file: blob:; connect-src 'self';">
   <title>MediDesk POS - Retail Pharmacy Management</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,8 +37,8 @@
         <div class="user-profile-badge">
           <div class="user-avatar" id="userAvatar">S</div>
           <div class="user-info">
-            <span class="user-name" id="userName">Syed Brothers</span>
-            <span class="user-role" id="userRole">Admin</span>
+            <span class="user-name" id="userName">Terminal Locked</span>
+            <span class="user-role" id="userRole">Locked</span>
           </div>
         </div>
 
@@ -508,7 +509,7 @@
             </div>
 
             <div style="display:flex; gap:12px; align-items:center;">
-              <label><input type="radio" name="stockFilter" value="LOW" checked> Low Stock (< Min Level)</label>
+              <label><input type="radio" name="stockFilter" value="LOW" checked> Low Stock (&lt; Min Level)</label>
               <label><input type="radio" name="stockFilter" value="OUT"> Out of Stock (0 Stock)</label>
               <label><input type="radio" name="stockFilter" value="ALL"> All Products</label>
             </div>
@@ -719,9 +720,33 @@
             <div style="display:flex; gap:12px; margin-top:10px;">
               <button class="btn btn-secondary" id="btnBackupDb">📤 Create Local Backup (.db)</button>
               <button class="btn btn-secondary" id="btnRestoreDb">📥 Restore Backup (.db)</button>
-              <button class="btn btn-danger" id="btnOpenFactoryResetModal" style="margin-left:auto;">
+              <button class="btn btn-danger admin-only" id="btnOpenFactoryResetModal" style="margin-left:auto;">
                 ⚠️ Factory Reset & Wipe Data
               </button>
+            </div>
+
+            <div id="userManagementContainer" class="admin-only">
+              <hr style="border:0; border-top:1px solid var(--border-color); margin:16px 0;">
+              <div class="panel-title" style="font-size:1rem;">👤 User & PIN Management (Admin Only)</div>
+              <div style="margin-top:10px;">
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                  <button class="btn btn-primary" id="btnOpenAddUser">➕ Add User</button>
+                </div>
+                <div class="table-container" style="max-height:300px; overflow-y:auto;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -860,9 +885,7 @@
           <button class="pin-key" data-key="BACK" style="font-size:0.85rem; color:var(--danger);">⌫</button>
         </div>
 
-        <div style="font-size:0.75rem; color:var(--text-dim); margin-top:8px;">
-          Default Seed PINs: Admin: <strong>1234</strong> | Pharmacist: <strong>5678</strong> | Cashier: <strong>0000</strong>
-        </div>
+        <div style="font-size:0.75rem; color:var(--text-dim); margin-top:8px;">Enter your 4-digit security PIN</div>
       </div>
     </div>
   </div>
@@ -1184,7 +1207,124 @@
   </div>
 
 
-  <!-- Application Frontend JavaScript -->
+  <!-- 11. Add Customer Modal -->
+  <div class="modal-overlay" id="modalAddCustomer">
+    <div class="modal-content" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 style="font-size:1rem; font-weight:700;">➕ Add Customer Account</h3>
+        <button type="button" class="modal-close">✕</button>
+      </div>
+      <form id="addCustomerForm">
+        <div class="form-group">
+          <label class="form-label">Customer Full Name:</label>
+          <input type="text" id="custNameInput" class="form-control" placeholder="e.g. Muhammad Ali" required>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Phone Number:</label>
+          <input type="text" id="custPhoneInput" class="form-control" placeholder="+92 300 1234567">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Address:</label>
+          <input type="text" id="custAddressInput" class="form-control" placeholder="e.g. Street 4, Sargodha">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Credit Limit in Rs:</label>
+          <input type="number" id="custCreditLimitInput" class="form-control" value="5000" min="0" step="1">
+        </div>
+        <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 12. Add User Modal -->
+  <div class="modal-overlay" id="modalAddUser">
+    <div class="modal-content" style="max-width:400px;">
+      <div class="modal-header">
+        <h3 style="font-size:1rem; font-weight:700;">👤 Add New User</h3>
+        <button type="button" class="modal-close">✕</button>
+      </div>
+      <form id="addUserForm">
+        <div class="form-group">
+          <label class="form-label">Full Name:</label>
+          <input type="text" id="newUserName" class="form-control" placeholder="e.g. Ahmad Khan" required>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Role:</label>
+          <select id="newUserRole" class="form-control" required>
+            <option value="Cashier">Cashier</option>
+            <option value="Manager">Manager</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Security PIN (4-8 digits):</label>
+          <input type="password" id="newUserPin" class="form-control" placeholder="Enter PIN" required minlength="4" maxlength="8" pattern="[0-9]{4,8}">
+          <div style="font-size:0.72rem; color:var(--warning); margin-top:4px;">⚠️ Cannot use common PINs like 1234, 5678, 0000</div>
+        </div>
+        <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 13. Change PIN Modal -->
+  <div class="modal-overlay" id="modalChangePin">
+    <div class="modal-content" style="max-width:380px;">
+      <div class="modal-header">
+        <h3 style="font-size:1rem; font-weight:700;">🔑 Change Security PIN</h3>
+        <button type="button" class="modal-close">✕</button>
+      </div>
+      <form id="changePinForm">
+        <input type="hidden" id="changePinUserId">
+        <div class="form-group">
+          <label class="form-label">Current PIN:</label>
+          <input type="password" id="currentPinInput" class="form-control" required minlength="4" maxlength="8">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">New PIN (4-8 digits):</label>
+          <input type="password" id="newPinInput" class="form-control" required minlength="4" maxlength="8" pattern="[0-9]{4,8}">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Confirm New PIN:</label>
+          <input type="password" id="confirmPinInput" class="form-control" required minlength="4" maxlength="8">
+        </div>
+        <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+          <button type="submit" class="btn btn-accent">Change PIN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Shared Utilities & State -->
+  <script src="modules/utils.js"></script>
+  <script src="modules/state.js"></script>
+  
+  <!-- Feature Modules -->
+  <script src="modules/auth.js"></script>
+  <script src="modules/navigation.js"></script>
+  <script src="modules/dashboard.js"></script>
+  <script src="modules/pos.js"></script>
+  <script src="modules/checkout.js"></script>
+  <script src="modules/inventory.js"></script>
+  <script src="modules/suppliers.js"></script>
+  <script src="modules/customers.js"></script>
+  <script src="modules/users.js"></script>
+  <script src="modules/sales.js"></script>
+  <script src="modules/restock.js"></script>
+  <script src="modules/expiry.js"></script>
+  <script src="modules/quotation.js"></script>
+  <script src="modules/settings.js"></script>
+  
+  <!-- Main Application Entry Point -->
   <script src="app.js"></script>
 </body>
 </html>
