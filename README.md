@@ -64,31 +64,40 @@ MediDesk POS has been hardened against common retail POS vulnerabilities:
 MediDesk POS separates UI rendering from backend database logic through a secure, modular IPC architecture:
 
 ```mermaid
-graph
+flowchart TD
+    subgraph ClientLayer["Client Layer (Modular Renderer)"]
         A["Modern Glassmorphic HTML5 / CSS3"] --> B["app.js Orchestrator"]
-        B --> C["15 Focused Feature Modules (/modules)"]
+        B --> C["15 Feature Modules (/modules)"]
         C --> D["Role-Based Screen & Action Guard"]
     end
 
-    subgraph Secure IPC Bridge
+    subgraph SecureIPC["Secure IPC Bridge Layer"]
         E["Context-Isolated Preload Bridge (preload.js)"]
-        C <--> E
     end
 
-    subgraph Desktop Core Engine (Main Process)
+    subgraph DesktopCore["Desktop Core Engine (Main Process)"]
         F["Electron 29 Main Process (main.js)"]
-        E <--> F
-        F --> G["35+ Named Parameterized IPC Handlers"]
-        G --> H["SQLite WASM Engine (sql.js)"]
-        H --> I["WAL Mode & Atomic .tmp Persistence"]
-        F --> J["Native Windows Silent Print Service"]
+        G["35+ Named Parameterized IPC Handlers"]
+        H["SQLite WASM Engine (sql.js)"]
+        I["WAL Mode & Atomic .tmp Persistence"]
+        J["Native Windows Silent Print Service"]
+        F --> G
+        G --> H
+        H --> I
+        F --> J
     end
 
-    subgraph Local File System Storage
-        H <--> K[("medidesk_pos.db")]
-        I --> L["/Documents/MediDeskPOS/Backups"]
-        F --> M["/Documents/MediDeskPOS/Prescriptions"]
+    subgraph StorageLayer["Local File System Storage"]
+        K[("medidesk_pos.db")]
+        L["/Documents/MediDeskPOS/Backups"]
+        M["/Documents/MediDeskPOS/Prescriptions"]
     end
+
+    C <--> E
+    E <--> F
+    H <--> K
+    I --> L
+    F --> M
 ```
 
 ---
