@@ -64,8 +64,7 @@ MediDesk POS has been hardened against common retail POS vulnerabilities:
 MediDesk POS separates UI rendering from backend database logic through a secure, modular IPC architecture:
 
 ```mermaid
-graph TD
-    subgraph Client Layer (Modular Renderer)
+graph
         A["Modern Glassmorphic HTML5 / CSS3"] --> B["app.js Orchestrator"]
         B --> C["15 Focused Feature Modules (/modules)"]
         C --> D["Role-Based Screen & Action Guard"]
